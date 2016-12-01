@@ -1,0 +1,144 @@
+Current configuration : 1801 bytes
+!
+! Last configuration change at 11:08:58 UTC Thu Dec 1 2016
+!
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname CE
+!
+boot-start-marker
+boot-end-marker
+!
+!
+enable secret 5 $1$8zi4$Ird1Ax6VZ6qa2j2CbiPik1
+!
+no aaa new-model
+mmi polling-interval 60
+no mmi auto-configure
+no mmi pvc
+mmi snmp-timeout 180
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+!
+!
+!
+!
+ip cef
+no ipv6 cef
+!
+multilink bundle-name authenticated
+!
+!
+!
+!
+!
+!
+!
+!
+!
+redundancy
+!
+!
+!
+!
+!
+!
+!
+crypto isakmp policy 10
+ encr 3des
+ hash sha256
+ authentication pre-share
+ group 5
+ lifetime 3600
+!
+crypto isakmp policy 20
+ encr 3des
+ authentication pre-share
+ group 2
+ lifetime 3600
+crypto isakmp key cisco address 172.30.20.2
+crypto isakmp key linux address 172.30.30.2
+!
+!
+crypto ipsec transform-set MTS esp-3des esp-sha-hmac
+ mode tunnel
+!
+!
+!
+crypto map IPSEC 1 ipsec-isakmp
+ set peer 172.30.20.2
+ set transform-set MTS
+ match address ipsec
+crypto map IPSEC 2 ipsec-isakmp
+ set peer 172.30.30.2
+ set transform-set MTS
+ match address ipsec2
+!
+!
+!
+!
+!
+interface Loopback0
+ ip address 192.168.10.1 255.255.255.0
+!
+interface Ethernet0/0
+ ip address 172.30.10.1 255.255.255.252
+ crypto map IPSEC
+!
+interface Ethernet0/1
+ no ip address
+ shutdown
+!
+interface Ethernet0/2
+ no ip address
+ shutdown
+!
+interface Ethernet0/3
+ no ip address
+ shutdown
+!
+ip forward-protocol nd
+!
+!
+no ip http server
+no ip http secure-server
+ip route 0.0.0.0 0.0.0.0 172.30.10.2
+!
+ip access-list extended ipsec
+ permit ip 192.168.10.0 0.0.0.255 192.168.20.0 0.0.0.255
+ip access-list extended ipsec2
+ permit ip 192.168.10.0 0.0.0.255 192.168.30.0 0.0.0.255
+!
+!
+!
+!
+control-plane
+!
+!
+!
+!
+!
+!
+!
+!
+line con 0
+ logging synchronous
+line aux 0
+line vty 0 4
+ password cisco
+ login
+ transport input telnet
+!
+!
+end
